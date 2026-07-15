@@ -1,0 +1,21 @@
+appsettings.Development.json
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies & build output
+venv/
+__pycache__/
+node_modules/
+bin/
+obj/
+dist/
+.vs/
+.pytest_cache/
+
+# Real bill photos
+*.jpg
+*.jpeg
+uploads/

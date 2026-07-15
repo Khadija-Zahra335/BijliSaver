@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============ THEME TOKENS ============ */
+:root {
+  --paper: #FAFBF9;
+  --card: #FFFFFF;
+  --line: #DFE7E2;
+  --brand: #0B6E4F;
+  --brand-dark: #0E3B2E;
+  --brand-tint: #E9F3EE;
+  --ink: #132A20;
+  --ink-muted: #5C7268;
+  --warn-tint: #FBF3DC;
+  --warn-ink: #7A5A07;
+  --danger: #C0392B;
+  --danger-tint: #FBE9E7;
+  --success-tint: #E8F7ED;
+}
+
+.dark {
+  --paper: #0F1714;
+  --card: #17221D;
+  --line: #26362F;
+  --brand: #2FA47C;
+  --brand-dark: #EAF3EE;     /* headings flip to light in dark mode */
+  --brand-tint: #16281F;
+  --ink: #E4EDE8;
+  --ink-muted: #93A89E;
+  --warn-tint: #2A2210;
+  --warn-ink: #E4C468;
+  --danger: #E4695B;
+  --danger-tint: #331B18;
+  --success-tint: #12291C;
+}
+
+html { font-size: 17px; }               /* global bump — everything scales up */
+body { @apply bg-paper text-ink font-sans antialiased; transition: background-color .25s, color .25s; }
+
+/* ---- Hero entrance ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp .6s ease-out both; }
+.delay-1 { animation-delay: .08s; }
+.delay-2 { animation-delay: .16s; }
+.delay-3 { animation-delay: .24s; }
+.delay-4 { animation-delay: .32s; }
+
+@keyframes pulseDot { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+.pulse-dot { animation: pulseDot 1.6s ease-in-out infinite; }
+
+/* The dotted background lives on ::before, not on .hero-grid itself —
+   mask-image affects the whole element it's set on, including children,
+   so putting it directly on .hero-grid faded out real content (the Urdu
+   line, "Free forever" row, sample report) past the 55% mark. */
+.hero-grid { position: relative; }
+.hero-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(11,110,79,.10) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+}
+.hero-grid > * { position: relative; z-index: 1; }
+.dark .hero-grid::before {
+  background-image: radial-gradient(circle, rgba(47,164,124,.14) 1px, transparent 1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-up, .pulse-dot { animation: none; }
+}
