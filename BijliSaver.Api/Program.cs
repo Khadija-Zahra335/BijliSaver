@@ -87,7 +87,10 @@ static string NpgsqlConnectionStringFromUri(string uri)
     return new Npgsql.NpgsqlConnectionStringBuilder
     {
         Host = parsed.Host,
-        Port = parsed.Port,
+        // Uri.Port is -1 when the URI has no explicit port — Neon and most
+        // managed Postgres providers omit it and rely on the 5432 default,
+        // which Uri doesn't know since it has no built-in "postgresql" scheme.
+        Port = parsed.Port == -1 ? 5432 : parsed.Port,
         Database = parsed.AbsolutePath.TrimStart('/'),
         Username = userInfo[0],
         Password = userInfo.Length > 1 ? userInfo[1] : "",
