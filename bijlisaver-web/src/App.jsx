@@ -10,10 +10,10 @@ import HistoryPage from './pages/HistoryPage.jsx'
 const ME = {
   name: 'Khadija Zahra',
   role: 'Full-Stack Developer · Lahore, Pakistan',
-  github: 'https://github.com/YOUR_USERNAME',
-  linkedin: 'https://linkedin.com/in/YOUR_USERNAME',
-  portfolio: 'https://YOUR_PORTFOLIO_SITE',
-  email: 'you@example.com',
+  github: 'https://github.com/Khadija-Zahra335E',
+  linkedin: 'https://www.linkedin.com/in/khadija-zahra-06a37a270/',
+  portfolio: 'https://khadijazahra-portfolio.vercel.app/',
+  email: 'khadijazahra153@gmail.com',
 }
 
 const navClass = ({ isActive }) =>
