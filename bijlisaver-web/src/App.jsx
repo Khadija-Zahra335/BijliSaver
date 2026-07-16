@@ -8,7 +8,7 @@ import HistoryPage from './pages/HistoryPage.jsx'
 
 // ====== EDIT THESE: your real links ======
 const ME = {
-  name: 'Anees',
+  name: 'Khadija Zahra',
   role: 'Full-Stack Developer · Lahore, Pakistan',
   github: 'https://github.com/YOUR_USERNAME',
   linkedin: 'https://linkedin.com/in/YOUR_USERNAME',
@@ -17,10 +17,10 @@ const ME = {
 }
 
 const navClass = ({ isActive }) =>
-  `text-lg font-medium transition ${isActive ? 'text-brand' : 'text-ink-muted hover:text-brand'}`
+  `text-sm font-medium transition ${isActive ? 'text-brand' : 'text-ink-muted hover:text-brand'}`
 
 const signInClass = ({ isActive }) =>
-  `rounded-btn border px-4 py-2 text-base font-semibold transition ${
+  `rounded-btn border px-3.5 py-1.5 text-sm font-semibold transition ${
     isActive ? 'border-brand bg-brand text-white' : 'border-line text-brand-dark hover:border-brand hover:bg-brand-tint'
   }`
 
@@ -63,7 +63,7 @@ export default function App() {
             <NavLink to="/" end className={navClass}>Home</NavLink>
             <NavLink to="/history" className={navClass}>My Bills</NavLink>
             {user ? (
-              <span className="flex items-center gap-2 text-base">
+              <span className="flex items-center gap-2 text-sm">
                 <span className="font-semibold text-brand-dark">Hi, {user.name.split(' ')[0]}</span>
                 <button onClick={() => { logout(); navigate('/') }} className="text-ink-muted transition hover:text-danger">
                   Sign out
@@ -74,7 +74,7 @@ export default function App() {
             )}
             <button
               onClick={goUpload}
-              className="rounded-btn bg-brand px-4 py-2.5 text-base font-semibold text-white transition hover:bg-brand-dark hover:text-paper"
+              className="rounded-btn bg-brand px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark hover:text-paper"
             >
               Upload Your Bill
             </button>
@@ -145,42 +145,32 @@ export default function App() {
 
       {/* Footer — always dark by design, independent of theme */}
       <footer className="bg-[#0E3B2E] text-night-text">
-        <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 py-12 md:grid-cols-3">
+        <div className="mx-auto grid w-full max-w-6xl gap-6 px-5 py-8 md:grid-cols-2">
           <div>
-            <div className="flex items-center gap-2 text-lg font-bold">
-              <span className="grid h-8 w-8 place-items-center rounded-chip bg-warn text-sm text-[#3d2e02]">⚡</span>
+            <div className="flex items-center gap-2 text-base font-bold">
+              <span className="grid h-7 w-7 place-items-center rounded-chip bg-warn text-sm text-[#3d2e02]">⚡</span>
               BijliSaver
             </div>
-            <p className="mt-3 max-w-[36ch] text-base leading-relaxed text-night-muted">
+            <p className="mt-2 max-w-[36ch] text-sm leading-relaxed text-night-muted">
               Electricity bills in Pakistan are confusing. BijliSaver reads yours and
               explains every rupee in simple words.
             </p>
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-warn">Under the hood</h3>
-            <ul className="mt-3 space-y-2 text-base text-night-muted">
-              <li>React + Tailwind frontend</li>
-              <li>ASP.NET Core API · PostgreSQL</li>
-              <li>FastAPI vision service (Gemini)</li>
-              <li>Math-verified AI extraction — 4 arithmetic identity checks on every bill</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-widest text-warn">Built by</h3>
-            <p className="mt-3 text-lg font-semibold">{ME.name}</p>
-            <p className="text-base text-night-muted">{ME.role}</p>
-            <div className="mt-3 flex flex-wrap gap-3 text-base">
-              <a href={ME.github} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-3 py-1.5 transition hover:border-warn hover:text-warn">GitHub</a>
-              <a href={ME.linkedin} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-3 py-1.5 transition hover:border-warn hover:text-warn">LinkedIn</a>
-              <a href={ME.portfolio} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-3 py-1.5 transition hover:border-warn hover:text-warn">Portfolio</a>
-              <a href={`mailto:${ME.email}`} className="rounded-btn border border-night-muted/40 px-3 py-1.5 transition hover:border-warn hover:text-warn">Email</a>
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-warn">Built by</h3>
+            <p className="mt-2 text-base font-semibold">{ME.name}</p>
+            <p className="text-sm text-night-muted">{ME.role}</p>
+            <div className="mt-2 flex flex-wrap gap-2 text-sm">
+              <a href={ME.github} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-2.5 py-1 transition hover:border-warn hover:text-warn">GitHub</a>
+              <a href={ME.linkedin} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-2.5 py-1 transition hover:border-warn hover:text-warn">LinkedIn</a>
+              <a href={ME.portfolio} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-2.5 py-1 transition hover:border-warn hover:text-warn">Portfolio</a>
+              <a href={`mailto:${ME.email}`} className="rounded-btn border border-night-muted/40 px-2.5 py-1 transition hover:border-warn hover:text-warn">Email</a>
             </div>
           </div>
         </div>
         <div className="border-t border-white/10">
-          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-4 text-base text-night-muted">
+          <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-3 text-xs text-night-muted">
             <span>© {new Date().getFullYear()} BijliSaver — made for everyday people · Made in Lahore 🇵🇰</span>
             <span>LESCO supported · more DISCOs coming</span>
           </div>

@@ -118,7 +118,11 @@ public class BillsController(
             });
         }
 
-        if (ocrResult.Status == "done")
+        // Compute insights even on "needs_review" — the extraction still has
+        // usable data, and the warning banner already tells the user the
+        // numbers might be imperfect. Withholding the savings plan entirely
+        // was worse than showing a caveated one.
+        if (ocrResult.Status is "done" or "needs_review")
         {
             bill.Insight = await insights.ComputeAsync(bill, ct);
 
