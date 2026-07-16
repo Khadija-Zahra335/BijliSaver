@@ -12,13 +12,6 @@ needs your own Neon/GitHub/Render accounts, so these are commands and steps
 for you to run — I can't create accounts or type secrets into anything on
 your behalf.
 
-## 0. Rotate the OCR service's API key first
-
-`ocr-service/bijlisaver-ocr/.env` has a live Gemini API key that got shown in
-chat earlier. Get a new one at https://aistudio.google.com/apikey before you
-deploy — don't ship the old one, and don't commit `.env` to git (it's already
-in `.gitignore`).
-
 ## 1. Push this repo to GitHub
 
 ```powershell
@@ -86,24 +79,3 @@ curl https://bijlisaver-api.onrender.com/api/bills
 curl https://bijlisaver-ocr.onrender.com/health
 ```
 
-## Notes / free-tier caveats
-
-- **Service names must be globally unique on Render.** If `bijlisaver-api`,
-  `bijlisaver-ocr`, or `bijlisaver-web` are taken, Render will suffix or ask
-  you to rename them — if so, update the cross-references in `render.yaml`
-  (`OcrService__BaseUrl`, `AllowedOrigins__0`, `VITE_API_BASE_URL`) to match
-  the actual assigned URLs, then redeploy.
-- **Cold starts**: API and OCR sleep after 15 minutes with no traffic and
-  take about a minute to wake up on the next request. The frontend (static)
-  never sleeps.
-- **750 free instance-hours/month** total across free web services in your
-  Render workspace. Two services that sleep when idle should stay well under
-  this for a hobby-traffic app.
-- **Neon free plan**: 0.5 GB storage, 100 compute-hours/month, 5 GB network
-  transfer/month — plenty for this app's scale.
-- LESCO tariff slab rates (FY 2025-26) are seeded automatically via
-  migration — slab warnings work for LESCO out of the box. Other DISCOs
-  still have no rate data seeded.
-- CORS is now configuration-driven (`AllowedOrigins__0`, `__1`, ...) instead
-  of hardcoded — if you add a custom domain later, add it as another
-  `AllowedOrigins__N` env var on `bijlisaver-api` rather than editing code.
