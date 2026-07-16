@@ -10,7 +10,7 @@ import HistoryPage from './pages/HistoryPage.jsx'
 const ME = {
   name: 'Khadija Zahra',
   role: 'Full-Stack Developer · Lahore, Pakistan',
-  github: 'https://github.com/Khadija-Zahra335E',
+  github: 'https://github.com/Khadija-Zahra335',
   linkedin: 'https://www.linkedin.com/in/khadija-zahra-06a37a270/',
   portfolio: 'https://khadijazahra-portfolio.vercel.app/',
   email: 'khadijazahra153@gmail.com',
