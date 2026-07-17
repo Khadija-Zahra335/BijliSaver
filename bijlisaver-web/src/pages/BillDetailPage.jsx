@@ -254,8 +254,10 @@ export default function BillDetailPage() {
               </p>
             </div>
           )}
+          {/* Savings card stays fixed dark green (like the footer): bg-brand-dark
+              flips light in dark mode, which made it light-on-light unreadable. */}
           {i?.savingsTip && (
-            <div className="rounded-panel bg-brand-dark p-5 text-night-text">
+            <div className="rounded-panel bg-[#0E3B2E] p-5 text-night-text">
               <h3 className="font-serif text-base font-bold">💰 Your savings plan</h3>
               <div className="mt-1.5 space-y-1.5 text-sm leading-relaxed text-night-muted">
                 {i.savingsTip.split('\n').filter(Boolean).map((line, idx) => <p key={idx}>{line}</p>)}
@@ -272,7 +274,7 @@ export default function BillDetailPage() {
             </svg>
             {sharing ? 'Preparing PDF…' : 'Share on WhatsApp'}
           </button>
-          <button onClick={goUpload} className="block w-full rounded-btn bg-brand px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-brand-dark">
+          <button onClick={goUpload} className="block w-full rounded-btn bg-brand px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-brand-dark hover:text-paper">
             Upload Another Bill
           </button>
         </div>

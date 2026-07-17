@@ -2,6 +2,10 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   darkMode: 'class',
+  // Touch screens "stick" hover styles after a tap; several buttons invert
+  // colors on hover, which looked like broken dark mode on mobile. This
+  // restricts hover: styles to devices that can actually hover.
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
       colors: {

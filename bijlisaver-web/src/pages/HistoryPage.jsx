@@ -41,7 +41,7 @@ export default function HistoryPage() {
         <div className="text-5xl">🧾</div>
         <h1 className="mt-4 font-serif text-2xl font-bold text-brand-dark">No bills yet</h1>
         <p className="mt-2 text-sm text-ink-muted">Upload your first bill and it will appear here with a full breakdown.</p>
-        <Link to="/" className="mt-5 inline-block rounded-btn bg-brand px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-dark">
+        <Link to="/" className="mt-5 inline-block rounded-btn bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark hover:text-paper">
           Upload a Bill
         </Link>
       </div>
