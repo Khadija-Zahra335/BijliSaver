@@ -157,11 +157,11 @@ export default function App() {
             </p>
           </div>
 
-          <div className="text-right">
+          <div>
             <h3 className="text-xs font-semibold uppercase tracking-widest text-warn">Built by</h3>
             <p className="mt-2 text-base font-semibold">{ME.name}</p>
             <p className="text-sm text-night-muted">{ME.role}</p>
-            <div className="mt-2 flex flex-wrap justify-end gap-2 text-sm">
+            <div className="mt-2 flex flex-wrap gap-2 text-sm">
               <a href={ME.github} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-2.5 py-1 transition hover:border-warn hover:text-warn">GitHub</a>
               <a href={ME.linkedin} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-2.5 py-1 transition hover:border-warn hover:text-warn">LinkedIn</a>
               <a href={ME.portfolio} target="_blank" rel="noreferrer" className="rounded-btn border border-night-muted/40 px-2.5 py-1 transition hover:border-warn hover:text-warn">Portfolio</a>
