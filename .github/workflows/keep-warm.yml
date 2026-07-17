@@ -1,0 +1,27 @@
+# Keeps the Render free-tier services awake during Pakistan daytime hours.
+#
+# Render spins a free service down after 15 idle minutes; the next visitor
+# then waits 30-60s for a cold start. Pinging every 10 minutes during the
+# hours people actually use the site avoids that, while staying inside
+# Render's 750 free instance-hours/month budget:
+#   2 services x ~11 h/day x 30 days ~= 660 h, leaving headroom for
+#   off-hours organic traffic.
+#
+# GitHub Actions cron runs in UTC: 04:00-14:50 UTC = 9:00am-7:50pm PKT.
+# The last ping at 7:50pm keeps the services awake until ~8:05pm.
+
+name: keep-warm
+
+on:
+  schedule:
+    - cron: "*/10 4-14 * * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API and OCR service
+        run: |
+          curl -s -o /dev/null -w "api: %{http_code} in %{time_total}s\n" --max-time 120 https://bijlisaver-api.onrender.com/api/bills || true
+          curl -s -o /dev/null -w "ocr: %{http_code} in %{time_total}s\n" --max-time 120 https://bijlisaver-ocr.onrender.com/health || true
