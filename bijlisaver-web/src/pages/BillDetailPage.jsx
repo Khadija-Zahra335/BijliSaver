@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getBill } from '../api.js'
 
 const rs = (n) =>
@@ -17,10 +17,16 @@ const CATEGORY_STYLE = {
 
 export default function BillDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [bill, setBill] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => { getBill(id).then(setBill).catch(e => setError(e.message)) }, [id])
+
+  function goUpload() {
+    navigate('/')
+    setTimeout(() => document.getElementById('upload-zone')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50)
+  }
 
   if (error) return <p className="mx-auto max-w-6xl px-5 py-10 text-danger">{error}</p>
   if (!bill) return <p className="mx-auto max-w-6xl px-5 py-10 text-ink-muted">Loading your bill…</p>
@@ -137,9 +143,9 @@ export default function BillDetailPage() {
               </div>
             </div>
           )}
-          <Link to="/" className="block rounded-btn bg-brand px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-brand-dark">
+          <button onClick={goUpload} className="block w-full rounded-btn bg-brand px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-brand-dark">
             Upload Another Bill
-          </Link>
+          </button>
         </div>
       </div>
     </div>

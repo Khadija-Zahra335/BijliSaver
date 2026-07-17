@@ -147,9 +147,15 @@ public class BillsController(
                 fpa_is_negative = (bill.TotalFpa ?? 0) < 0,
             }, ct);
 
+            // Append the AI advice rather than replacing — insights.ComputeAsync
+            // already put a concrete "cut X, save Rs Y" line in SavingsTip, and
+            // overwriting it meant that guaranteed-accurate line disappeared
+            // whenever the AI call succeeded, leaving only its free-form tips
+            // (which don't always state a rupee amount).
             if (advice is not null)
-                bill.Insight.SavingsTip =
-                    advice.Summary + "\n\n" + string.Join("\n", advice.Tips.Select(t => "• " + t));
+                bill.Insight.SavingsTip = bill.Insight.SavingsTip
+                    + "\n\n" + advice.Summary
+                    + "\n\n" + string.Join("\n", advice.Tips.Select(t => "• " + t));
         }
 
         db.Bills.Add(bill);

@@ -82,6 +82,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             e.HasMany(x => x.Charges).WithOne().HasForeignKey(c => c.BillId);
             e.HasMany(x => x.HistoryEntries).WithOne().HasForeignKey(h => h.BillId);
             e.HasOne(x => x.Insight).WithOne().HasForeignKey<BillInsight>(i => i.BillId);
+            e.HasIndex(x => x.UserId);   // GET /api/bills filters on this
         });
 
         mb.Entity<BillCharge>(e =>
