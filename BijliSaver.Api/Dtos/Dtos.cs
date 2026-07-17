@@ -76,7 +76,27 @@ public record ChargeLineDto(
     string DisplayName,      // "Fuel Price Adjustment" (or raw label if unrecognized)
     decimal Amount,
     string? Explanation,     // the plain-language line — never null for recognized charges
+    string? ExplanationUr,   // same explanation in Urdu, null for unrecognized charges
     string Category);        // energy|tax|surcharge|fee|adjustment|penalty|other
+
+// "Why did my bill change?" vs the previous month. Source is "previous_bill"
+// when the user has an earlier uploaded bill (full per-charge diff possible)
+// or "history" when only the bill's own printed history table is available
+// (units + amount only).
+public record ChargeDeltaDto(
+    string DisplayName,
+    decimal Previous,
+    decimal Current,
+    decimal Delta);
+
+public record ComparisonDto(
+    string PreviousMonth,    // "YYYY-MM"
+    int? PreviousUnits,
+    decimal? PreviousAmount,
+    int? UnitsDelta,
+    decimal? AmountDelta,
+    string Source,           // previous_bill | history
+    List<ChargeDeltaDto> TopChanges);
 
 public record BillDetailDto(
     Guid Id,
@@ -90,7 +110,8 @@ public record BillDetailDto(
     string? DueDate,
     string OcrStatus,
     List<ChargeLineDto> Charges,
-    InsightDto? Insight);
+    InsightDto? Insight,
+    ComparisonDto? Comparison);
 
 public record InsightDto(
     int? SlabReached,

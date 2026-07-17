@@ -185,6 +185,7 @@ public class BillsController(
         var bill = await db.Bills
             .Include(b => b.Charges).ThenInclude(c => c.ChargeDef)
             .Include(b => b.Insight)
+            .Include(b => b.HistoryEntries)
             .SingleOrDefaultAsync(b => b.Id == id, ct);
 
         if (bill is null) return NotFound();
@@ -216,6 +217,7 @@ public class BillsController(
                 c.ChargeDef?.DisplayName ?? c.RawLabel,
                 c.Amount,
                 c.ChargeDef?.ExplanationEn ?? "An additional charge printed on your bill.",
+                c.ChargeDef?.ExplanationUr,
                 c.ChargeDef?.Category ?? "other"))
             .ToList();
 
@@ -245,7 +247,72 @@ public class BillsController(
             bill.DueDate?.ToString("yyyy-MM-dd"),
             bill.OcrStatus,
             charges,
-            insightDto);
+            insightDto,
+            await BuildComparison(bill, ct));
+    }
+
+    // "Why did my bill change?" — prefer a previously uploaded bill (full
+    // per-charge diff); fall back to the bill's own printed 12-month history
+    // table (units + amount only), which also covers anonymous uploads.
+    private async Task<ComparisonDto?> BuildComparison(Bill bill, CancellationToken ct)
+    {
+        Bill? prev = null;
+        if (bill.UserId is not null)
+            prev = await db.Bills
+                .Include(b => b.Charges).ThenInclude(c => c.ChargeDef)
+                .Where(b => b.UserId == bill.UserId
+                            && b.BillingMonth < bill.BillingMonth
+                            && b.Id != bill.Id)
+                .OrderByDescending(b => b.BillingMonth)
+                .FirstOrDefaultAsync(ct);
+
+        if (prev is not null)
+        {
+            // Diff charges by display name; only lines present on both bills
+            // make a meaningful delta.
+            var prevByName = prev.Charges
+                .GroupBy(c => c.ChargeDef?.DisplayName ?? c.RawLabel)
+                .ToDictionary(g => g.Key, g => g.Sum(c => c.Amount));
+
+            var topChanges = bill.Charges
+                .GroupBy(c => c.ChargeDef?.DisplayName ?? c.RawLabel)
+                .Select(g => new { Name = g.Key, Current = g.Sum(c => c.Amount) })
+                .Where(x => prevByName.ContainsKey(x.Name))
+                .Select(x => new ChargeDeltaDto(x.Name, prevByName[x.Name], x.Current,
+                    Math.Round(x.Current - prevByName[x.Name], 0)))
+                .Where(d => Math.Abs(d.Delta) >= 1)
+                .OrderByDescending(d => Math.Abs(d.Delta))
+                .Take(3)
+                .ToList();
+
+            return new ComparisonDto(
+                prev.BillingMonth.ToString("yyyy-MM"),
+                prev.UnitsConsumed,
+                prev.CurrentBill,
+                bill.UnitsConsumed - prev.UnitsConsumed,
+                bill.CurrentBill is decimal cur && prev.CurrentBill is decimal p
+                    ? Math.Round(cur - p, 0) : null,
+                "previous_bill",
+                topChanges);
+        }
+
+        // History-table fallback: most recent printed month before this bill.
+        var histPrev = bill.HistoryEntries
+            .Where(h => h.Month < bill.BillingMonth)
+            .OrderByDescending(h => h.Month)
+            .FirstOrDefault();
+        if (histPrev is null || (histPrev.Units is null && histPrev.Amount is null))
+            return null;
+
+        return new ComparisonDto(
+            histPrev.Month.ToString("yyyy-MM"),
+            histPrev.Units,
+            histPrev.Amount,
+            bill.UnitsConsumed - histPrev.Units,
+            bill.CurrentBill is decimal c2 && histPrev.Amount is decimal a2
+                ? Math.Round(c2 - a2, 0) : null,
+            "history",
+            []);
     }
 
     private static string TrendFromHistory(Bill bill)
