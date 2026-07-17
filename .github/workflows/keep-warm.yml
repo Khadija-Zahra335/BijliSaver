@@ -23,5 +23,7 @@ jobs:
     steps:
       - name: Ping API and OCR service
         run: |
-          curl -s -o /dev/null -w "api: %{http_code} in %{time_total}s\n" --max-time 120 https://bijlisaver-api.onrender.com/api/bills || true
+          # /health runs SELECT 1, keeping the Neon database compute awake
+          # too — not just the Render web service.
+          curl -s -o /dev/null -w "api: %{http_code} in %{time_total}s\n" --max-time 120 https://bijlisaver-api.onrender.com/health || true
           curl -s -o /dev/null -w "ocr: %{http_code} in %{time_total}s\n" --max-time 120 https://bijlisaver-ocr.onrender.com/health || true

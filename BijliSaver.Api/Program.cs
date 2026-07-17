@@ -78,6 +78,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+// Touches the database on purpose: the keep-warm pinger hits this so Neon's
+// free-tier compute (which auto-suspends after ~5 idle minutes) stays awake
+// along with the Render service — otherwise the first real query still pays
+// the database resume cost even when the API itself is warm.
+app.MapGet("/health", async (BijliSaver.Api.Data.AppDbContext db) =>
+{
+    await db.Database.ExecuteSqlRawAsync("SELECT 1");
+    return Results.Ok(new { status = "ok" });
+});
+
 app.Run();
 
 static string NpgsqlConnectionStringFromUri(string uri)

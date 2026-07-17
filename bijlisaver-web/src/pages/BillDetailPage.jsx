@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { getBill } from '../api.js'
 
@@ -21,6 +21,8 @@ export default function BillDetailPage() {
   const [bill, setBill] = useState(null)
   const [error, setError] = useState(null)
   const [urdu, setUrdu] = useState(false)
+  const [sharing, setSharing] = useState(false)
+  const pageRef = useRef(null)
 
   useEffect(() => { getBill(id).then(setBill).catch(e => setError(e.message)) }, [id])
 
@@ -29,7 +31,7 @@ export default function BillDetailPage() {
     setTimeout(() => document.getElementById('upload-zone')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50)
   }
 
-  function shareOnWhatsApp() {
+  function shareText() {
     const i = bill.insight
     const lines = [
       `⚡ BijliSaver — my ${bill.billingMonth} electricity bill, explained`,
@@ -37,15 +39,56 @@ export default function BillDetailPage() {
     ]
     if (i?.taxPercentage != null)
       lines.push(`Taxes & extra charges: ${i.taxPercentage}% (${rs(i.taxTotal)})`)
-    const cmp = bill.comparison
-    if (cmp?.amountDelta != null)
-      lines.push(cmp.amountDelta > 0
-        ? `📈 Rs ${Math.abs(cmp.amountDelta).toLocaleString('en-PK')} more than ${cmp.previousMonth}`
-        : `📉 Rs ${Math.abs(cmp.amountDelta).toLocaleString('en-PK')} less than ${cmp.previousMonth}`)
-    const firstTip = i?.savingsTip?.split('\n').filter(Boolean)[0]
-    if (firstTip) lines.push(`💰 ${firstTip}`)
-    lines.push('', `Understand your own bill (free): ${window.location.origin}`)
-    window.open(`https://wa.me/?text=${encodeURIComponent(lines.join('\n'))}`, '_blank', 'noopener')
+    lines.push(`Full breakdown attached as PDF.`, '', `Understand your own bill (free): ${window.location.origin}`)
+    return lines.join('\n')
+  }
+
+  // Renders the whole breakdown (charges, comparison, savings plan) into a
+  // one-page PDF. On phones the PDF file goes straight into the native share
+  // sheet (→ WhatsApp); desktop browsers can't attach files to wa.me, so we
+  // download the PDF and open WhatsApp with a text summary to attach it to.
+  async function shareOnWhatsApp() {
+    if (sharing) return
+    setSharing(true)
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import('html2canvas'),
+        import('jspdf'),
+      ])
+      const canvas = await html2canvas(pageRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: getComputedStyle(document.body).backgroundColor,
+      })
+      const width = canvas.width / 2
+      const height = canvas.height / 2
+      const pdf = new jsPDF({
+        orientation: width > height ? 'landscape' : 'portrait',
+        unit: 'px',
+        format: [width, height],
+      })
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.92), 'JPEG', 0, 0, width, height)
+      const fileName = `BijliSaver-${bill.billingMonth}.pdf`
+      const file = new File([pdf.output('blob')], fileName, { type: 'application/pdf' })
+
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: 'My electricity bill, explained',
+          text: `⚡ My ${bill.billingMonth} bill, explained by BijliSaver`,
+        })
+      } else {
+        pdf.save(fileName)
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText())}`, '_blank', 'noopener')
+      }
+    } catch (e) {
+      if (e?.name !== 'AbortError') {
+        // PDF generation failed — fall back to the plain text share.
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareText())}`, '_blank', 'noopener')
+      }
+    } finally {
+      setSharing(false)
+    }
   }
 
   if (error) return <p className="mx-auto max-w-6xl px-5 py-10 text-danger">{error}</p>
@@ -56,7 +99,7 @@ export default function BillDetailPage() {
   const needsReview = bill.ocrStatus === 'needs_review'
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-5 py-7">
+    <div ref={pageRef} className="mx-auto w-full max-w-6xl px-5 py-7">
       {/* Header row */}
       <div className="flex items-baseline justify-between">
         <h1 className="font-serif text-2xl font-bold text-brand-dark">Bill for {bill.billingMonth}</h1>
@@ -221,12 +264,13 @@ export default function BillDetailPage() {
           )}
           <button
             onClick={shareOnWhatsApp}
-            className="flex w-full items-center justify-center gap-2 rounded-btn bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1DA851]"
+            disabled={sharing}
+            className="flex w-full items-center justify-center gap-2 rounded-btn bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1DA851] disabled:opacity-60"
           >
             <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z" />
             </svg>
-            Share on WhatsApp
+            {sharing ? 'Preparing PDF…' : 'Share on WhatsApp'}
           </button>
           <button onClick={goUpload} className="block w-full rounded-btn bg-brand px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-brand-dark">
             Upload Another Bill

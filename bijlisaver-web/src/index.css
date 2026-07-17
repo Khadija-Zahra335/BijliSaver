@@ -36,6 +36,11 @@
 }
 
 html { font-size: 17px; }               /* global bump — everything scales up */
+/* The layout max-width is rem-based, so scaling the root font on very wide
+   (or zoomed-out) viewports widens the whole page proportionally instead of
+   leaving a small column floating between huge margins. */
+@media (min-width: 1700px) { html { font-size: 20px; } }
+@media (min-width: 2200px) { html { font-size: 23px; } }
 body { @apply bg-paper text-ink font-sans antialiased; transition: background-color .25s, color .25s; }
 
 /* ---- Hero entrance ---- */
